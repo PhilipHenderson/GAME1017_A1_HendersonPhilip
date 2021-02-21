@@ -15,19 +15,16 @@ void State::Resume(){}
 
 // Title Class Begins
 TitleState::TitleState(){}
-
 void TitleState::Enter()
 {
 	cout << "Entering TitleState..." << endl;
 }
-
 void TitleState::Update()
 {
 	if (Engine::Instance().KeyDown(SDL_SCANCODE_N))
 		STMA::ChangeState(new GameState());
 	// Parse N Key and Change to teh new GameState
 }
-
 void TitleState::Render()
 {
 	cout << "Rendering TitleState..." << endl;
@@ -35,7 +32,6 @@ void TitleState::Render()
 	SDL_RenderClear(Engine::Instance().GetRenderer());
 	State::Render();
 }
-
 void TitleState::Exit()
 {
 	cout << "Exiting TitleState..." << endl;
@@ -49,10 +45,13 @@ void GameState::Enter()
 	cout << "Entering GameState..." << endl;
 }
 void GameState::Update()
-{
+{	
+	// Parse X Key and Change to teh new TitleState
 	if (Engine::Instance().KeyDown(SDL_SCANCODE_X))
 		STMA::ChangeState(new TitleState());
-	// Parse X Key and Change to teh new TitleState
+	// Parse P Key and Change to teh new PauseState
+	else if (Engine::Instance().KeyDown(SDL_SCANCODE_P))
+		STMA::PushState(new PauseState());
 
 		//Scroll the backgrounds. Check if they need to snap back.
 	for (int i = 0; i < 2; i++)
@@ -126,39 +125,42 @@ void GameState::Update()
 }
 void GameState::Render()
 {
-	cout << "Rendering GameState..." << endl;
-	//SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 50, 100, 200, 255);
-	//SDL_RenderClear(Engine::Instance().GetRenderer());
-	//State::Render();
+	if (dynamic_cast<GameState*>(STMA::GetStates().back())) // check to see if current state is of type GAMESTATE
+	{
+		cout << "Rendering GameState..." << endl;
+		//SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 50, 100, 200, 255);
+		//SDL_RenderClear(Engine::Instance().GetRenderer());
+		//State::Render();
 
 		SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 0, 0, 0, 255);
-	SDL_RenderClear(Engine::Instance().GetRenderer()); // Clear the screen with the draw color.
-	// Render stuff. Background first.
-	for (int i = 0; i < 2; i++)
-		SDL_RenderCopy(Engine::Instance().GetRenderer(), Engine::Instance().m_pBGText, Engine::Instance().bgArray[i].GetSrcP(), Engine::Instance().bgArray[i].GetDstP());
-	// Player.
-	SDL_RenderCopyEx(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_player->GetSrcP(), Engine::Instance().m_player->GetDstP(), Engine::Instance().m_player->GetAngle(), &Engine::Instance().m_pivot, SDL_FLIP_NONE);
-	/*SDL_SetRenderDrawBlendMode(m_pRenderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 255, 128);
-	SDL_RenderFillRect(m_pRenderer, m_player->GetDstP());*/
-	// Player bullets.	
-	for (int i = 0; i < (int)Engine::Instance().m_vPBullets.size(); i++)
-	{
-		SDL_RenderCopyEx(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_vPBullets[i]->GetSrcP(), Engine::Instance().m_vPBullets[i]->GetDstP(), 90, &Engine::Instance().m_pivot, SDL_FLIP_NONE);
-		/*SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 0, 128);
-		SDL_RenderFillRect(m_pRenderer, m_vPBullets[i]->GetDstP());*/
+		SDL_RenderClear(Engine::Instance().GetRenderer()); // Clear the screen with the draw color.
+		// Render stuff. Background first.
+		for (int i = 0; i < 2; i++)
+			SDL_RenderCopy(Engine::Instance().GetRenderer(), Engine::Instance().m_pBGText, Engine::Instance().bgArray[i].GetSrcP(), Engine::Instance().bgArray[i].GetDstP());
+		// Player.
+		SDL_RenderCopyEx(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_player->GetSrcP(), Engine::Instance().m_player->GetDstP(), Engine::Instance().m_player->GetAngle(), &Engine::Instance().m_pivot, SDL_FLIP_NONE);
+		/*SDL_SetRenderDrawBlendMode(m_pRenderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 255, 128);
+		SDL_RenderFillRect(m_pRenderer, m_player->GetDstP());*/
+		// Player bullets.	
+		for (int i = 0; i < (int)Engine::Instance().m_vPBullets.size(); i++)
+		{
+			SDL_RenderCopyEx(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_vPBullets[i]->GetSrcP(), Engine::Instance().m_vPBullets[i]->GetDstP(), 90, &Engine::Instance().m_pivot, SDL_FLIP_NONE);
+			/*SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 0, 128);
+			SDL_RenderFillRect(m_pRenderer, m_vPBullets[i]->GetDstP());*/
+		}
+		// Enemies.
+		for (int i = 0; i < (int)Engine::Instance().m_vEnemies.size(); i++)
+		{
+			SDL_RenderCopyEx(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_vEnemies[i]->GetSrcP(), Engine::Instance().m_vEnemies[i]->GetDstP(), -90, &Engine::Instance().m_pivot, SDL_FLIP_NONE);
+			/*SDL_SetRenderDrawColor(m_pRenderer, 255, 0, 0, 128);
+			SDL_RenderFillRect(m_pRenderer, m_vEnemies[i]->GetDstP());*/
+		}
+		// Enemy bullets.
+		for (int i = 0; i < (int)Engine::Instance().m_vEBullets.size(); i++)
+			SDL_RenderCopy(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_vEBullets[i]->GetSrcP(), Engine::Instance().m_vEBullets[i]->GetDstP());
+		SDL_RenderPresent(Engine::Instance().GetRenderer());
 	}
-	// Enemies.
-	for (int i = 0; i < (int)Engine::Instance().m_vEnemies.size(); i++)
-	{
-		SDL_RenderCopyEx(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_vEnemies[i]->GetSrcP(), Engine::Instance().m_vEnemies[i]->GetDstP(), -90, &Engine::Instance().m_pivot, SDL_FLIP_NONE);
-		/*SDL_SetRenderDrawColor(m_pRenderer, 255, 0, 0, 128);
-		SDL_RenderFillRect(m_pRenderer, m_vEnemies[i]->GetDstP());*/
-	}
-	// Enemy bullets.
-	for (int i = 0; i < (int)Engine::Instance().m_vEBullets.size(); i++)
-		SDL_RenderCopy(Engine::Instance().GetRenderer(), Engine::Instance().m_pSprText, Engine::Instance().m_vEBullets[i]->GetSrcP(), Engine::Instance().m_vEBullets[i]->GetDstP());
-	SDL_RenderPresent(Engine::Instance().GetRenderer());
 }
 void GameState::Exit()
 {
@@ -169,6 +171,58 @@ void GameState::Resume()
 	cout << "Resuming GameState..." << endl;
 }
 //GameState End
+
+// PauseState Begins
+PauseState::PauseState() {}
+void PauseState::Enter()
+{
+	cout << "Entering PauseState..." << endl;
+}
+void PauseState::Update()
+{
+	if (Engine::Instance().KeyDown(SDL_SCANCODE_R))
+		STMA::PopState();
+
+}
+void PauseState::Render()
+{
+	cout << "Rendering PauseState..." << endl;
+	STMA::GetStates().front()->Render();
+	SDL_SetRenderDrawBlendMode(Engine::Instance().GetRenderer(), SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 20, 150, 20, 175);
+	SDL_Rect rect{ 256, 128, 512, 512 };
+	SDL_RenderFillRect(Engine::Instance().GetRenderer(), &rect);
+	State::Render();
+}
+void PauseState::Exit()
+{
+	cout << "Exiting PauseState..." << endl;
+}
+// PauseState End
+
+// LoseState Begins
+LoseState::LoseState(){}
+void LoseState::Enter()
+{
+	cout << "Entering LoseState..." << endl;
+}
+void LoseState::Update()
+{
+	//if collision: player+bullet, player+enemy 
+	//begin lose state
+}
+void LoseState::Render()
+{
+	cout << "Rendering LoseState..." << endl;
+	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 0, 200, 100, 255);
+	SDL_RenderClear(Engine::Instance().GetRenderer());
+	State::Render();
+}
+void LoseState::Exit()
+{
+	cout << "Exiting TitleState..." << endl;
+}
+// LoseState End
 
 Engine::Engine() :m_iESpawn(0), m_iESpawnMax(60), m_pivot({ 0,0 })
 {	// Again showing a mix of either initializers or in-body initialization. Initializers happen first.
@@ -289,6 +343,7 @@ void Engine::CheckCollision()
 			// Game over!
 			cout << "Player goes boom!" << endl;
 			Mix_PlayChannel(-1, m_vSounds[2], 0);
+			STMA::ChangeState(new LoseState());
 			break;
 		}
 	}
@@ -326,6 +381,7 @@ void Engine::CheckCollision()
 			delete m_vEBullets[i];
 			m_vEBullets[i] = nullptr;
 			CleanVector<Bullet*>(m_vEBullets, m_bEBNull);
+			STMA::ChangeState(new LoseState());
 			break;
 		}
 	}
@@ -391,26 +447,4 @@ Engine& Engine::Instance()
 	return instance;
 }
 
-PauseState::PauseState(){}
 
-void PauseState::Enter()
-{
-	cout << "Entering PauseState..." << endl;
-}
-
-void PauseState::Update()
-{
-	if (Engine::Instance().KeyDown(SDL_SCANCODE_R))
-		STMA::PopState();
-
-}
-
-void PauseState::Render()
-{
-	cout << "Rendering PauseState..." << endl;
-}
-
-void PauseState::Exit()
-{
-	cout << "Exiting PauseState..." << endl;
-}
