@@ -30,6 +30,9 @@
     <ClCompile Include="StateManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -47,9 +50,18 @@
     <ClInclude Include="StateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Img\sprites.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="foreground.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Img\background.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

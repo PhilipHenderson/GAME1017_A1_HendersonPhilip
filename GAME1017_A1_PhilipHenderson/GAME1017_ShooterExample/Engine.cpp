@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "StateManager.h"
+#include "TextureManager.h"
 #include "States.h"
 
 #include "Utilities.h"

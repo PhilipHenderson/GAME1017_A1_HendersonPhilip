@@ -1,5 +1,6 @@
 #include "States.h"
 #include "StateManager.h"
+#include "TextureManager.h"
 #include "Engine.h"
 #include<iostream>
 #include "Engine.cpp"
@@ -18,6 +19,7 @@ TitleState::TitleState(){}
 void TitleState::Enter()
 {
 	cout << "Entering TitleState..." << endl;
+
 }
 void TitleState::Update()
 {
@@ -30,6 +32,9 @@ void TitleState::Render()
 	cout << "Rendering TitleState..." << endl;
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 0,200,100,255);
 	SDL_RenderClear(Engine::Instance().GetRenderer());
+	for (int i = 0; i < 2; i++)
+		SDL_RenderCopy(Engine::Instance().GetRenderer(), Engine::Instance().m_pBGText, Engine::Instance().bgArray[i].GetSrcP(), Engine::Instance().bgArray[i].GetDstP());
+	
 	State::Render();
 }
 void TitleState::Exit()
@@ -43,6 +48,7 @@ GameState::GameState(){}
 void GameState::Enter()
 {	
 	cout << "Entering GameState..." << endl;
+	TEMA::Load("","tiles");
 }
 void GameState::Update()
 {	
@@ -216,6 +222,8 @@ void LoseState::Render()
 	cout << "Rendering LoseState..." << endl;
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 0, 200, 100, 255);
 	SDL_RenderClear(Engine::Instance().GetRenderer());
+	for (int i = 0; i < 2; i++)
+		SDL_RenderCopy(Engine::Instance().GetRenderer(), Engine::Instance().m_pBGText, Engine::Instance().bgArray[i].GetSrcP(), Engine::Instance().bgArray[i].GetDstP());
 	State::Render();
 }
 void LoseState::Exit()
@@ -246,6 +254,7 @@ bool Engine::Init(const char* title, int xpos, int ypos, int width, int height, 
 			m_pRenderer = SDL_CreateRenderer(m_pWindow, -1, 0);
 			if (m_pRenderer != nullptr) // Renderer init success.
 			{
+				TEMA::Init();
 				m_pBGText = IMG_LoadTexture(m_pRenderer, "Img/background.png");
 				m_pSprText = IMG_LoadTexture(m_pRenderer, "Img/sprites.png");
 				if (Mix_Init(MIX_INIT_MP3) != 0) // Mixer init success.
@@ -446,5 +455,3 @@ Engine& Engine::Instance()
 	static Engine instance; // Magic statics. Creating the object.
 	return instance;
 }
-
-
